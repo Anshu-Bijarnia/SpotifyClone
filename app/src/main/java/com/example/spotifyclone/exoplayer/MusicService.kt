@@ -1,11 +1,11 @@
 package com.example.spotifyclone.exoplayer
 
-import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore.Audio.Media
+import android.os.Handler
+import android.os.Looper
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
@@ -27,6 +27,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
+
 @AndroidEntryPoint
 class MusicService : MediaBrowserServiceCompat() {
 
@@ -38,6 +39,9 @@ class MusicService : MediaBrowserServiceCompat() {
 
     @Inject
     lateinit var exoPlayer : ExoPlayer
+
+    // This is used to make sure that exoplayer is only accessed through the main thread only and not from multiple threads
+    var mainThreadHandler = Handler(Looper.getMainLooper())
 
     private lateinit var musicNotificationManager: MusicNotificationManager
 
@@ -116,23 +120,26 @@ class MusicService : MediaBrowserServiceCompat() {
         // We find the current song index that we want to play, if it is null then we prepare the player for the first song
         // -> 0 else we will find the index of that song.
         val curSongIndex = if (curPlayingSong == null ) 0 else songs.indexOf(itemToPlay)
-        exoPlayer.setMediaSource(firebaseMusicSource.asMediaSource(dataSourceFactory))
-        exoPlayer.prepare()
-        // To make sure every song plays from the beginning, and seek our song to the curSongIndex
-        exoPlayer.seekTo(curSongIndex,0L)
-        exoPlayer.playWhenReady = playNow
+        mainThreadHandler.post {
+            exoPlayer.setMediaSource(firebaseMusicSource.asMediaSource(dataSourceFactory))
+            exoPlayer.prepare()
+            exoPlayer.seekTo(curSongIndex,0L)  // To make sure every song plays from the beginning, and seek our song to the curSongIndex
+            exoPlayer.playWhenReady = playNow
+        }
     }
     // When the task of this service is removed(when the intent is removed), we stop the exoplayer from playing
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
-        exoPlayer.stop()
+        mainThreadHandler.post{exoPlayer.stop()}
     }
     // Here we will clean up the resources
     override fun onDestroy() {
         super.onDestroy()
         serviceScope.cancel()
-        exoPlayer.removeListener(musicPlayerEventListener) // To prevent memory leak
-        exoPlayer.release() // Release the resources of exoplayer
+        mainThreadHandler.post {
+            exoPlayer.removeListener(musicPlayerEventListener)// To prevent memory leak
+            exoPlayer.release() // Release the resources of exoplayer
+        }
     }
     // Our app is configured in such a way that its acts as browsable media objects (playlist,albums,recommended section)
     // We can also include the functionality of denying the request of certain clients, not implemented here
