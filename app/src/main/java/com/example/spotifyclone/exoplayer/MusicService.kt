@@ -1,13 +1,16 @@
 package com.example.spotifyclone.exoplayer
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore.Audio.Media
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
+import androidx.annotation.RequiresApi
 import androidx.media.MediaBrowserServiceCompat
 import com.example.spotifyclone.exoplayer.callbacks.MusicPlaybackPreparer
 import com.example.spotifyclone.exoplayer.callbacks.MusicPlayerEventListener
@@ -58,6 +61,7 @@ class MusicService : MediaBrowserServiceCompat() {
             private set
     }
 
+    @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate() {
         super.onCreate()
         // Loading the firebase music source -> this is done immediately after the service has been created.
@@ -66,7 +70,7 @@ class MusicService : MediaBrowserServiceCompat() {
             firebaseMusicSource.fetchMediaData()
         }
         val activityIntent = packageManager?.getLaunchIntentForPackage(packageName)?.let {
-            PendingIntent.getActivity(this,0,it,0)
+            PendingIntent.getActivity(this,0,it,PendingIntent.FLAG_MUTABLE)
         }
         mediaSession = MediaSessionCompat(this,SERVICE_TAG).apply {
             setSessionActivity(activityIntent)
