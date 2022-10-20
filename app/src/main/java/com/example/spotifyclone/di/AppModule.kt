@@ -6,6 +6,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.example.spotifyclone.R
 import com.example.spotifyclone.SpotifyApplication
+import com.example.spotifyclone.adapters.SwipeSongAdapter
 import com.example.spotifyclone.exoplayer.MusicServiceConnection
 import dagger.Module
 import dagger.Provides
@@ -22,6 +23,13 @@ object AppModule {
     @Singleton
     @Provides
     fun provideMusicServiceConnection (@ApplicationContext context: Context) = MusicServiceConnection(context)
+
+    // This is not needed for songAdapter because we are injecting something into its constructor, and when we do that dagger hilt will
+    // automatically figure our how to also inject this song adapter because it knows how to create the injected object, but in our
+    // swipe song adapter dagger hilt doesn't know how to create it, we could have created an empty constructor to avoid this function (@Inject constructor())
+    @Singleton
+    @Provides
+    fun provideSwipeSongAdapter() = SwipeSongAdapter()
 
     @Singleton
     @Provides

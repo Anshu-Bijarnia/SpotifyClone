@@ -5,16 +5,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.RequestManager
 import com.example.spotifyclone.data.entities.Song
-import com.example.spotifyclone.databinding.ListItemBinding
-import javax.inject.Inject
+import com.example.spotifyclone.databinding.SwipeItemBinding
 
-// To display our list of songs
-class SongAdapter @Inject constructor(
-    private val glide : RequestManager
-) : RecyclerView.Adapter<SongAdapter.SongViewHolder>() {
-    class SongViewHolder (val binding: ListItemBinding) : RecyclerView.ViewHolder (binding.root)
+// To make swiping songs possible
+class SwipeSongAdapter : RecyclerView.Adapter<SwipeSongAdapter.SongViewHolder>() {
+    class SongViewHolder (val binding: SwipeItemBinding) : RecyclerView.ViewHolder (binding.root)
 
     private val diffCallback = object : DiffUtil.ItemCallback<Song> (){
         override fun areItemsTheSame(oldItem: Song, newItem: Song): Boolean {
@@ -35,16 +31,15 @@ class SongAdapter @Inject constructor(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        val binding = ListItemBinding.inflate(layoutInflater,parent,false)
+        val binding = SwipeItemBinding.inflate(layoutInflater,parent,false)
         return SongViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: SongViewHolder, position: Int) {
         val song = songs[position]
         holder.binding.apply {
-            tvPrimary.text = song.title
-            tvSecondary.text = song.subtitle
-            glide.load(song.imageUrl).into(ivItemImage)
+            val text = "${song.title} - ${song.subtitle}"
+            tvPrimary.text = text
         }
 // Setting the onclick listener to this item view
         holder.itemView.setOnClickListener {
