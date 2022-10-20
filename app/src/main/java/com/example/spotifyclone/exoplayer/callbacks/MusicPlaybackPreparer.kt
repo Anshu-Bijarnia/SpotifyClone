@@ -13,7 +13,7 @@ class MusicPlaybackPreparer(
     private val firebaseMusicSource: FirebaseMusicSource,
     // lambda function called when our player is prepared, so we can respond to that
 // from within our music service
-    private val playerPrepared : (MediaMetadataCompat?) -> Unit
+    private val playerPrepared: (MediaMetadataCompat?) -> Unit
 ) : MediaSessionConnector.PlaybackPreparer {
     override fun onCommand(
         player: Player,

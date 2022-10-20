@@ -15,20 +15,21 @@ import com.example.spotifyclone.other.Constants.NOTIFICATION_ID
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 
-class MusicNotificationManager (
+class MusicNotificationManager(
     private val context: Context,
     // Takes session token from our music service
-    sessionToken : MediaSessionCompat.Token,
+    sessionToken: MediaSessionCompat.Token,
     // Listener that contains the functions that will be called when our notification is created/ swiped away by the user
     // which will stop the music service
-    notificationListener : PlayerNotificationManager.NotificationListener,
+    notificationListener: PlayerNotificationManager.NotificationListener,
     // Detect when a new song starts playing (this will help us to make changes to the duration and all that of the notification)
     private val newSongCallback: () -> Unit
-        ){
+) {
 
-    private val notificationManager : PlayerNotificationManager
+    private val notificationManager: PlayerNotificationManager
+
     init {
-        val mediaController = MediaControllerCompat(context,sessionToken)
+        val mediaController = MediaControllerCompat(context, sessionToken)
         notificationManager = PlayerNotificationManager.Builder(
             context,
             NOTIFICATION_ID,
@@ -44,13 +45,16 @@ class MusicNotificationManager (
                 setMediaSessionToken(sessionToken)
             }
     }
-    fun showNotification (player: Player) {
+
+    fun showNotification(player: Player) {
         notificationManager.setPlayer(player)
     }
-    private inner class DescriptionAdapter (
-        private val mediaController : MediaControllerCompat
-            ) : PlayerNotificationManager.MediaDescriptionAdapter {
+
+    private inner class DescriptionAdapter(
+        private val mediaController: MediaControllerCompat
+    ) : PlayerNotificationManager.MediaDescriptionAdapter {
         override fun getCurrentContentTitle(player: Player): CharSequence {
+            newSongCallback() // Not sure about the correct position of this -> putting it here because getCurrentContentTitle is called whenever our current song changes
             return mediaController.metadata.description.title.toString()
         }
 
@@ -68,7 +72,7 @@ class MusicNotificationManager (
         ): Bitmap? {
             Glide.with(context).asBitmap()
                 .load(mediaController.metadata.description.iconUri)
-                .into(object :CustomTarget<Bitmap>(){
+                .into(object : CustomTarget<Bitmap>() {
                     override fun onResourceReady(
                         resource: Bitmap,
                         transition: Transition<in Bitmap>?
