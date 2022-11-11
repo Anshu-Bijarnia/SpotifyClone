@@ -71,7 +71,7 @@ class SongFragment : Fragment(R.layout.fragment_song) {
 
                 // After we leave the seekbar we should seek the song to that position, and start updating the seekbar
                 override fun onStopTrackingTouch(p0: SeekBar?) {
-                    seekBar?.let {
+                    seekBar.let {
                         mainViewModel.seekTo(it.progress.toLong())
                         shouldUpdateSeekbar = true
                     }
@@ -135,14 +135,14 @@ class SongFragment : Fragment(R.layout.fragment_song) {
         songViewModel.curPlayerPosition.observe(viewLifecycleOwner) {
             // Only update the seekbar if we are allowed to, also we want to update our current position text view
             if (shouldUpdateSeekbar) {
-                binding.seekBar.progress = it.toInt()
+                binding.seekBar.progress = (it).toInt()
                 setCurPlayingTimeToTextView(it)
             }
         }
         // This 1800000L is put here because the music player had 30min as the starting time of every song and 30min+song duration as the ending time
         songViewModel.curSongDuration.observe(viewLifecycleOwner) {
-            binding.seekBar.max = (it-1800000L).toInt()
-            val dateFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
+            binding.seekBar.max = (it).toInt()
+            val dateFormat = SimpleDateFormat("mm:ss",Locale.getDefault())
             binding.tvSongDuration.text = dateFormat.format(it-1800000L)
         }
     }
@@ -150,6 +150,6 @@ class SongFragment : Fragment(R.layout.fragment_song) {
     private fun setCurPlayingTimeToTextView(ms: Long) {
         val dateFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
         binding.tvCurTime.text =
-            dateFormat.format(ms - 1800000L) // The time will be formatted in the pattern given above -> mm:ss
+            dateFormat.format(ms-1800000L) // The time will be formatted in the pattern given above -> mm:ss
     }
 }

@@ -28,4 +28,4 @@ inline val PlaybackStateCompat.currentPlaybackPosition: Long
         // The old and new values can be used to calculate the exact position of the song.
         val timeDelta = SystemClock.elapsedRealtime() - lastPositionUpdateTime
         (position + (timeDelta * playbackSpeed)).toLong()
-    } else position // if the song is not playing, we return position (it is the value when the player was last updated -> 0 if position is not set)
+    } else (position) // if the song is not playing, we return position (it is the value when the player was last updated -> 0 if position is not set)
