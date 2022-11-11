@@ -24,7 +24,7 @@ inline val PlaybackStateCompat.isPlayEnabled
 
 inline val PlaybackStateCompat.currentPlaybackPosition: Long
     get() = if (state == STATE_PLAYING) {
-        // We only get a specific position that was last updated in our player, exoplayer wont continously update the current playback position
+        // We only get a specific position that was last updated in our player, exoplayer wont continuously update the current playback position
         // The old and new values can be used to calculate the exact position of the song.
         val timeDelta = SystemClock.elapsedRealtime() - lastPositionUpdateTime
         (position + (timeDelta * playbackSpeed)).toLong()

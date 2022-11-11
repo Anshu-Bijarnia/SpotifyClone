@@ -19,6 +19,7 @@ import com.example.spotifyclone.ui.viewmodels.SongViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -138,16 +139,17 @@ class SongFragment : Fragment(R.layout.fragment_song) {
                 setCurPlayingTimeToTextView(it)
             }
         }
+        // This 1800000L is put here because the music player had 30min as the starting time of every song and 30min+song duration as the ending time
         songViewModel.curSongDuration.observe(viewLifecycleOwner) {
-            binding.seekBar.max = it.toInt()
+            binding.seekBar.max = (it-1800000L).toInt()
             val dateFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
-            binding.tvSongDuration.text = dateFormat.format(it)
+            binding.tvSongDuration.text = dateFormat.format(it-1800000L)
         }
     }
 
     private fun setCurPlayingTimeToTextView(ms: Long) {
         val dateFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
         binding.tvCurTime.text =
-            dateFormat.format(ms) // The time will be formatted in the pattern given above -> mm:ss
+            dateFormat.format(ms - 1800000L) // The time will be formatted in the pattern given above -> mm:ss
     }
 }
